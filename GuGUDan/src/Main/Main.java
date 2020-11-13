@@ -10,7 +10,7 @@ public class Main {
 	
 	static int RankerNum = 10;
 	static int[] Rank = new int[RankerNum];
-	static String[] RankerName = new String[RankerNum];
+	static String[] RankerName = {"","","","","","","","","",""};
 	static Scanner scan = new Scanner(System.in);
 	static Random rand = new Random();
 	static Timer time = new Timer();
@@ -30,10 +30,10 @@ public class Main {
 		// 30점 30점 + 6문제 + 10점추가
 		char str;
 		char RankStr;
-		String RankName;
+		String RankName = "";
 		
 		do {
-			int a, b, c, answer = 0, score=0, saveTime = 30, step=1, cuttingScore= 30;
+			int a, b, c, answer = 0, score=0, saveTime = 30, step=1, cuttingScore= 30,exp = 0;
 			long startTime=0, endTime=0;
 			boolean gameOver = false;
 			
@@ -44,8 +44,9 @@ public class Main {
 			startTime = System.currentTimeMillis();
 			while(str == 'y' || str == 'Y') {	
 				// 단계 상승
-				if(score >= cuttingScore) {
+				if(exp >= 10) {
 					step++;
+					exp = 0;
 					saveTime -= 2;
 					cuttingScore += 6 * (5*step) + 10;
 					startTime = System.currentTimeMillis();
@@ -59,6 +60,10 @@ public class Main {
 				
 				clearConsole();
 				System.out.println("==========================================");
+				System.out.print("[");
+				for(int i = 0; i < exp; i++) System.out.print("■");
+				for(int i = exp; i < 10; i++) System.out.print("□");
+				System.out.println("]\n");
 				System.out.printf("[ %d단계 | 제한시간 : %d초  | 현재 점수 : %d ]\n",step,saveTime, score);
 				System.out.printf("Q : %d * %d\n", a, b);
 				System.out.println("==========================================\n");
@@ -89,6 +94,7 @@ public class Main {
 				// 답 체크
 				if(!gameOver && answer == c) {
 					score += 5 * step;
+					exp+=1;
 				}
 				
 				
@@ -104,13 +110,31 @@ public class Main {
 					}while(RankStr != 'y' && RankStr != 'n' && RankStr != 'Y' && RankStr != 'N');
 					
 					if(RankStr == 'Y' || RankStr == 'y') {
-						System.out.println("[이름을 적어주세요]");
+						clearConsole();
+						System.out.println("[이름을 적어주세요] (최대 3자)");
 						System.out.print("A : ");
 						do {
 							RankName = scan.next();
 						}while(RankName.equals(""));
 						
+						for(int i = 0; i < RankerNum; i++) {
+							if(Rank[i] < score) {
+								RankSort(Rank,i,score);
+								RankerSort(RankerName,i,RankName);
+								break;
+							}
+						}
 						
+						clearConsole();
+						
+						System.out.println("======== 랭킹 ========");
+						String Name = "";
+						String num = "0";
+						for(int i = 0; i < RankerNum; i++) {
+							Name = RankerName[i].equals("") ? "---" : RankerName[i];
+							num = Rank[i] == 0 ? "---" : Rank[i]+"";
+							System.out.printf("%2d | %3s   %s\n\n",i+1,Name,num);
+						}
 					}
 					
 					
@@ -131,6 +155,29 @@ public class Main {
 	
 	static void clearConsole() {
 		for(int i = 0; i < 100; i++) System.out.println("");
+	}
+	
+	static void RankSort(int[] list,int i, int score) {
+		int temp = list[i];
+		int temp2 = list[i];
+		list[i] = score;
+		for(int j = i+1; j<RankerNum; j++) {
+			temp2 = list[j];
+			list[j] = temp;
+			temp = temp2;
+		}
+	}
+	
+	static void RankerSort(String[] list,int i ,String name) {
+		String temp = list[i];
+		String temp2 = list[i];
+		
+		list[i] = name;
+		for(int j = i+1; j<RankerNum; j++) {
+			temp2 = list[j];
+			list[j] = temp;
+			temp = temp2;
+		}
 	}
 }
 
