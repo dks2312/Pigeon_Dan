@@ -1,10 +1,12 @@
-package Main;
 
 import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 	
@@ -13,14 +15,20 @@ public class Main {
 	static String[] RankerName = {"","","","","","","","","",""};
 	static Scanner scan = new Scanner(System.in);
 	static Random rand = new Random();
+	static boolean out = true;
+	static int count=0;
 	static Timer time = new Timer();
-	
-	static TimerTask m_time = new TimerTask() {
-		public void run() {
-			System.out.print("안영");
-	}};
-	
-	
+	static int cuttingScore= 30;
+	static int saveTime = 30;
+	static int exp = 0;
+	static ScheduledExecutorService  timer = Executors.newSingleThreadScheduledExecutor();			//타이머 인스턴트화
+	static int stage=1;
+	static int rest;
+	static boolean gameOver = false;
+	static boolean abc;												//타이머 클래스의 게임 오버 구현
+	static ScheduledFuture<?> futureTask = null;					//스케줄 타입의 futureTask 값 없애기
+        
+    
 	public static void main(String[] args) {
 		
 		rand.setSeed(System.currentTimeMillis());
@@ -31,25 +39,30 @@ public class Main {
 		char str;
 		char RankStr;
 		String RankName = "";
-		
 		do {
-			int a, b, c, answer = 0, score=0, saveTime = 30, step=1, cuttingScore= 30,exp = 0;
+			int a, b, c, answer = 0, score=0, step=1;
 			long startTime=0, endTime=0;
-			boolean gameOver = false;
-			
+			saveTime = 30;
+			int io=0;
+			gameOver=false;
+			stage=1;
+			rest=0;
+			exp=0;
 			System.out.print("99단 도전 하시겠나요 [Y/N]\n");
 			System.out.print("A : ");
 			str = scan.next().charAt(0);
-			
 			startTime = System.currentTimeMillis();
+			abc = false;
 			while(str == 'y' || str == 'Y') {	
 				// 단계 상승
-				if(exp >= 10) {
+				if(exp == (10*stage)) {
 					step++;
-					exp = 0;
+					stage = stage + 1;
 					saveTime -= 2;
 					cuttingScore += 6 * (5*step) + 10;
+	
 					startTime = System.currentTimeMillis();
+					futureTask = timer.scheduleAtFixedRate(Timer_stage.timer_stage(exp,stage), 3,1,TimeUnit.SECONDS);	//타이머 클래스에서 함수를 스케줄에 집어넣기
 				}	
 				
 				
@@ -57,12 +70,15 @@ public class Main {
 				a = 2+ rand.nextInt(8);
 				b = 2+ rand.nextInt(8);
 				c = a * b;
-				
+				io = io + 1;
+				if(io==1) {
+					 futureTask = timer.scheduleAtFixedRate(Timer_stage.timer_stage(exp,stage), 1, 1,TimeUnit.SECONDS);	////타이머 클래스에서 함수를 스케줄에 집어넣기
+				}
 				clearConsole();
 				System.out.println("==========================================");
 				System.out.print("[");
-				for(int i = 0; i < exp; i++) System.out.print("■");
-				for(int i = exp; i < 10; i++) System.out.print("□");
+				for(int i = 0; i < rest; i++) System.out.print("■");
+				for(int i = rest; i < 10; i++) System.out.print("□");
 				System.out.println("]\n");
 				System.out.printf("[ %d단계 | 제한시간 : %d초  | 현재 점수 : %d ]\n",step,saveTime, score);
 				System.out.printf("Q : %d * %d\n", a, b);
@@ -81,13 +97,19 @@ public class Main {
 						flag= true;
 						scan.nextLine();
 					}
+					
 				}while(flag);
 				
+				if(out == false) {						//시간 지나면 게임아웃 시키기
+					gameOver = true;
+		
+				}
 				
 				//  ====== 답 입력 후 ======
 				// 타임오버 검사
 				endTime = System.currentTimeMillis();
 				if(endTime - startTime > saveTime*1000 || answer != c) {
+					abc=true;									//답이 틀리면 타이머 클래스에 틀렸다고 알려줘서 타이머 멈추게하기
 					gameOver = true;
 				}
 				
@@ -95,6 +117,7 @@ public class Main {
 				if(!gameOver && answer == c) {
 					score += 5 * step;
 					exp+=1;
+					rest=(exp%10);
 				}
 				
 				
