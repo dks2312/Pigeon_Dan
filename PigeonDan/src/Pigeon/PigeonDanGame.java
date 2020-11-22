@@ -107,7 +107,7 @@ public class PigeonDanGame {
 							score += 5 * stage;
 							exp++;
 						}else{
-							wrongAnswers[(sumRest+(rest-1))-exp] = a + " * " + b;
+							wrongAnswers[(sumRest+(rest-1))-exp] = a + " * " + b + "= ?  ÀûÀº ´ä:" + answer;
 						}
 						
 						float answerTime = Timer_stage.timeCount - startTime;
