@@ -22,7 +22,7 @@ public class PigeonDanGame {
 	static ScheduledExecutorService  timer = Executors.newSingleThreadScheduledExecutor();			//타이머 인스턴트화
 	
 	// 게임 관련 변수 
-	static int saveTime = 30;	// 제한시간 
+	static float saveTime = 30;	// 제한시간 
 	static int exp = 0;			// 전체 맞힌 문제 수
 	
 	static boolean gameOver = false;	// 게임 끝
@@ -41,7 +41,7 @@ public class PigeonDanGame {
 			
 			int live = 10;
 			int score=0, stage=1, sumRest = 0;
-			int sumTime = 0,maxTime = 0, minTime = saveTime, startTime=0;
+			float sumTime = 0,maxTime = 0, minTime = saveTime, startTime=0;
 			
 			String[] wrongAnswers = new String[live];
 			
@@ -53,15 +53,13 @@ public class PigeonDanGame {
 				int rest = 0;
 				
 				// 타이머 작동
-				futureTask = timer.scheduleAtFixedRate(Timer_stage.timer_stage(exp,saveTime), 0, 1,TimeUnit.SECONDS);	//타이머 클래스에서 함수를 스케줄에 집어넣기
+				futureTask = timer.scheduleAtFixedRate(Timer_stage.timer_stage(exp,saveTime), 0, 100,TimeUnit.MILLISECONDS);	//타이머 클래스에서 함수를 스케줄에 집어넣기
 				
 				// 단계 상승
 				if(exp != 0) {
 					stage++;
 					if(saveTime> 3 +2) saveTime -= 2;	// 최소 시간 3초
 				}	
-				
-				
 				
 				//  ======== 문제 시작  ========
 				do{	
@@ -79,8 +77,8 @@ public class PigeonDanGame {
 					for(int i = rest; i < live; i++) System.out.print("□");
 					System.out.println("]\n");
 					
-					System.out.printf("[ %d단계 | 제한시간 : %d초 ] ",stage, saveTime);
-					System.out.printf("[남은 시간 : %d초  | 현재 점수 : %d ]\n",saveTime - Timer_stage.timeCount, score);
+					System.out.printf("[ %d단계 | 제한시간 : %.1f초 ] ",stage, saveTime);
+					System.out.printf("[남은 시간 : %.1f초  | 현재 점수 : %d ]\n",saveTime - Timer_stage.timeCount, score);
 					System.out.printf("Q : %d * %d\n", a, b);
 					System.out.println("==========================================\n");
 					System.out.print("A : ");
@@ -97,7 +95,7 @@ public class PigeonDanGame {
 						catch(InputMismatchException e){ 
 							flag= true;
 							scan.nextLine();
-							System.out.print("문자가 포함되었습니다 다시 압력: "+ !gameOver +"&&"+ (rest!=10) +"="+ (!gameOver && rest!=10));
+							System.out.print("문자가 포함되었습니다 다시 압력: ");
 						}
 					}while(!gameOver && flag);
 					
@@ -109,12 +107,10 @@ public class PigeonDanGame {
 							score += 5 * stage;
 							exp++;
 						}else{
-							wrongAnswers[(sumRest+rest-1)-exp] = a + " * " + b;
+							wrongAnswers[(sumRest+(rest-1))-exp] = a + " * " + b;
 						}
 						
-						
-						
-						int answerTime = Timer_stage.timeCount - startTime;
+						float answerTime = Timer_stage.timeCount - startTime;
 						if(maxTime < answerTime) maxTime = answerTime;
 						if(minTime > answerTime) minTime = answerTime;
 					}
@@ -137,9 +133,9 @@ public class PigeonDanGame {
 				System.out.printf("=== 틀린 문제 리스트입니다 ===\n");
 				for(int i=0; i<wrongAnswers.length; i++) if(wrongAnswers[i]!=null) System.out.println((i+1)+"번 - "+wrongAnswers[i]);
 				
-				System.out.printf("\n\n**모든 시간은 소수점까지 계산하지 않아 정확하지 않을 수 있습니다.**\n");
-				System.out.printf("[ 총 소비한 시간: %d초, 푼 문제: %d개, 맞춘 문제: %d개, 최대 단계: %d단계 ]\n",sumTime, sumRest, exp, stage);
-				System.out.printf("[ 한 문제당 소비한 평균 시간: %d초, 문제에 소비한 최대 시간: %d초, 문제에 소비한 최소 시간: %d초 ]\n", sumTime/sumRest, maxTime, minTime);
+				System.out.printf("\n\n**모든 시간은 소수점 첫째 자리까지 계산하므로 정확하지 않을 수 있습니다.**\n");
+				System.out.printf("[ 총 소비한 시간: %.0f분 %.0f초, 푼 문제: %d개, 맞춘 문제: %d개, 최대 단계: %d단계 ]\n",sumTime/60,sumTime%60, sumRest, exp, stage);
+				System.out.printf("[ 한 문제당 소비한 평균 시간: %.1f초, 문제에 소비한 최대 시간: %.1f초, 문제에 소비한 최소 시간: %.1f초 ]\n", sumTime/sumRest, maxTime, minTime);
 				System.out.printf("[ 최종 점수 : %d점 ]\n\n",score);
 				
 				

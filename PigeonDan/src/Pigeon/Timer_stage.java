@@ -9,7 +9,7 @@ import java.util.TimerTask;
 
 public class Timer_stage {
 	
-	static int timeCount=0;
+	static float timeCount=0;
 	
 	static Timer time = new Timer();
 	static Timer three_time = new Timer();
@@ -18,7 +18,7 @@ public class Timer_stage {
 	static ScheduledExecutorService  timer = Executors.newSingleThreadScheduledExecutor();
 	static ScheduledFuture<?> futureTask = null;
 	
-	static Runnable timer_stage(int exp, int saveTime) {				//타이머 함수
+	static Runnable timer_stage(int exp, float saveTime) {				//타이머 함수
 		timer = Executors.newSingleThreadScheduledExecutor();
 		timeCount = 0;
 		Runnable  terminate = new Runnable() {						//타이머 변수
@@ -28,7 +28,7 @@ public class Timer_stage {
 //	        	System.out.println("Terminate task executed");         
 //	        	System.out.printf("%d\n",saveTime);
 //	        	System.out.printf("%d\n",timeCount);	
-				timeCount++;
+				timeCount += 0.1;
 				
 				// 타이머 초기화? 재설정? 아무튼.. 있어야 함
 	        	if(exp != 0  && exp % 10 == 0) {	// 첫 단계 제외, 단계 시작마다 
