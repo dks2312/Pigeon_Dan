@@ -11,6 +11,7 @@ public class PigeonDanGameMain {
 		System.out.print("A : ");
 		scan.next().charAt(0);
 		
+
 		PigeonDanGame.state();
 		
 		System.out.println("[ 게임을 종료합니다 ]");
